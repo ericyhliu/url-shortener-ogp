@@ -59,14 +59,14 @@ export default function Home() {
           URL Shortener
         </Text>
         <Text as="p" size="4" mb="4" style={{ color: "#445072", fontFamily: "var(--font-inter)" }}>
-          Paste a long URL and get a short URL back.
+          Paste a long URL to shorten it.
         </Text>
 
         <div style={{ position: "relative" }}>
           <div className={styles.row}>
             <TextField.Root
               size="3"
-              placeholder="https://example.com/paste-your-long-url-here"
+              placeholder="Your long url here..."
               value={url}
               onChange={(e) => { setUrl(e.target.value); setError(null); }}
               onKeyDown={(e) => { if (e.key === "Enter") handleShorten(); }}
