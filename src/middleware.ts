@@ -5,9 +5,12 @@ import { supabase } from "@/lib/supabase";
 export async function middleware(req: NextRequest) {
   const shortCode = req.nextUrl.pathname.slice(1);
 
+  const toAbsolute = (url: string) =>
+    url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
+
   const cached = await redis.get<string>(`short:${shortCode}`);
   if (cached) {
-    return NextResponse.redirect(cached);
+    return NextResponse.redirect(toAbsolute(cached));
   }
 
   const { data, error } = await supabase
@@ -17,12 +20,13 @@ export async function middleware(req: NextRequest) {
     .single();
 
   if (error || !data) {
-    return NextResponse.next();
+    // Short code not found — redirect to home
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   await redis.set(`short:${shortCode}`, data.long_url);
 
-  return NextResponse.redirect(data.long_url);
+  return NextResponse.redirect(toAbsolute(data.long_url));
 }
 
 export const config = {
