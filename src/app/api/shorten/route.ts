@@ -3,6 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/redis";
 import { supabase } from "@/lib/supabase";
 import { encodeId } from "@/lib/sqids";
+import { isValidUrl } from "@/utils";
 
 const ratelimit = new Ratelimit({
   redis,
@@ -19,8 +20,8 @@ export async function POST(req: Request) {
 
   const { longUrl } = await req.json();
 
-  if (!longUrl) {
-    return NextResponse.json({ error: "Missing longUrl" }, { status: 400 });
+  if (!longUrl || !isValidUrl(longUrl)) {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
   }
 
   const counter = await redis.incr("url_counter");

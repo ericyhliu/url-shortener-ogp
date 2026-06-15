@@ -42,7 +42,14 @@ describe("POST /api/shorten", () => {
     const res = await POST(makeRequest({}));
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toBe("Missing longUrl");
+    expect(body.error).toBe("Invalid URL");
+  });
+
+  it("returns 400 when longUrl is invalid", async () => {
+    const res = await POST(makeRequest({ longUrl: "not-a-url" }));
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe("Invalid URL");
   });
 
   it("returns 429 when rate limit is exceeded", async () => {
