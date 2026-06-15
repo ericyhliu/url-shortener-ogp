@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
 
   const cached = await redis.get<string>(`short:${shortCode}`);
   if (cached) {
-    return NextResponse.redirect(toAbsolute(cached));
+    return NextResponse.redirect(toAbsolute(cached), { status: 302 });
   }
 
   const { data, error } = await supabase
@@ -20,13 +20,13 @@ export async function middleware(req: NextRequest) {
     .single();
 
   if (error || !data) {
-    // Short code not found — redirect to home
-    return NextResponse.redirect(new URL("/", req.url));
+    // Short code not found — fall through to Next.js not-found page
+    return NextResponse.next();
   }
 
   await redis.set(`short:${shortCode}`, data.long_url);
 
-  return NextResponse.redirect(toAbsolute(data.long_url));
+  return NextResponse.redirect(toAbsolute(data.long_url), { status: 302 });
 }
 
 export const config = {
