@@ -10,21 +10,34 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [shortUrl, setShortUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleShorten = async () => {
     if (!isValidUrl(url)) {
-      setError(true);
+      setError("Must be a valid URL.");
       setShortUrl(null);
       return;
     }
-    setError(false);
+    setError(null);
     setLoading(true);
     setShortUrl(null);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setShortUrl(`${window.location.origin}/abc123`);
-    setUrl("");
+
+    const res = await fetch("/api/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ longUrl: url }),
+    });
+
+    const data = await res.json();
     setLoading(false);
+
+    if (!res.ok) {
+      setError("Something went wrong.");
+      return;
+    }
+
+    setShortUrl(`${window.location.origin}/${data.shortCode}`);
+    setUrl("");
   };
 
   const handleCopy = async (text: string) => {
@@ -49,7 +62,7 @@ export default function Home() {
               size="3"
               placeholder="https://example.com/paste-your-long-url-here"
               value={url}
-              onChange={(e) => { setUrl(e.target.value); setError(false); }}
+              onChange={(e) => { setUrl(e.target.value); setError(null); }}
               onKeyDown={(e) => { if (e.key === "Enter") handleShorten(); }}
               style={{ flex: 1 }}
             />
@@ -66,7 +79,7 @@ export default function Home() {
           <div style={{ position: "absolute", top: "100%", left: 0, right: 0, paddingTop: "8px" }}>
             {error && (
               <Text as="p" size="1" weight="medium" style={{ color: "#E53E3E" }}>
-                Must be a valid URL.
+                {error}
               </Text>
             )}
             {shortUrl && (
