@@ -31,6 +31,11 @@ export default function Home() {
     const data = await res.json();
     setLoading(false);
 
+    if (res.status === 429) {
+      setError("Too many requests. Try again later.");
+      return;
+    }
+
     if (!res.ok) {
       setError("Something went wrong.");
       return;

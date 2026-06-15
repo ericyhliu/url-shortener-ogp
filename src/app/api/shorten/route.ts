@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
+import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/redis";
 import { supabase } from "@/lib/supabase";
 import { encodeId } from "@/lib/sqids";
 
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(100, "1 h"),
+});
+
 export async function POST(req: Request) {
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
+
   const { longUrl } = await req.json();
 
   if (!longUrl) {
