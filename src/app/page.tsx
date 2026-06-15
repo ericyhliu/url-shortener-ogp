@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Container, Text, TextField, Button, Spinner } from "@radix-ui/themes";
+import { Box, Text, TextField, Button, Spinner } from "@radix-ui/themes";
 import { Copy, Check } from "lucide-react";
 import { isValidUrl } from "@/utils";
+import styles from "./page.module.css";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -52,8 +53,8 @@ export default function Home() {
   };
 
   return (
-    <Box height="100vh" style={{ display: "flex", alignItems: "center", paddingTop: "32px" }}>
-      <Container size="2">
+    <Box height="100vh" style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "32px" }}>
+      <div className={styles.wrapper}>
         <Text as="p" size="8" weight="bold" mb="2" style={{ color: "#293044", fontFamily: "var(--font-inter)" }}>
           URL Shortener
         </Text>
@@ -62,7 +63,7 @@ export default function Home() {
         </Text>
 
         <div style={{ position: "relative" }}>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div className={styles.row}>
             <TextField.Root
               size="3"
               placeholder="https://example.com/paste-your-long-url-here"
@@ -75,7 +76,8 @@ export default function Home() {
               size="3"
               onClick={handleShorten}
               disabled={loading || !url}
-              style={{ backgroundColor: "#4A61C0", color: "white", cursor: "pointer", width: "96px" }}
+              className={styles.button}
+              style={{ backgroundColor: "#4A61C0", color: "white", cursor: "pointer" }}
             >
               {loading ? <Spinner /> : "Shorten"}
             </Button>
@@ -88,7 +90,7 @@ export default function Home() {
               </Text>
             )}
             {shortUrl && (
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div className={styles.row}>
                 <TextField.Root
                   size="3"
                   value={shortUrl}
@@ -100,8 +102,8 @@ export default function Home() {
                   size="3"
                   variant="soft"
                   onClick={() => handleCopy(shortUrl)}
+                  className={styles.button}
                   style={{
-                    width: "96px",
                     cursor: "pointer",
                     backgroundColor: copied ? "#F0FDF4" : undefined,
                     color: copied ? "#16A34A" : "#6B7280",
@@ -114,7 +116,7 @@ export default function Home() {
             )}
           </div>
         </div>
-      </Container>
+      </div>
     </Box>
   );
 }

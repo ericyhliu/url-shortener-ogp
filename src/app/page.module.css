@@ -1,0 +1,25 @@
+.wrapper {
+  padding: 0 32px;
+  width: 100%;
+  max-width: 640px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  width: 96px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 540px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
